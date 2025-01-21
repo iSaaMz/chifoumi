@@ -1,37 +1,9 @@
-// Login.jsx
 import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
+import useAuth from '../../hooks/useAuth'
 
 const LoginForm = () => {
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const navigate = useNavigate()
-
-  const handleLogin = async (e) => {
-    e.preventDefault()
-    try {
-      const response = await fetch('http://fauques.freeboxos.fr:3000/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        localStorage.setItem('token', data.token)
-        localStorage.setItem('username', username)
-        navigate('/game')
-      } else {
-        setError('Identifiants incorrects')
-      }
-    } catch (err) {
-      console.error(err)
-      setError('Erreur de connexion')
-    }
-  }
+  const { username, setUsername, password, setPassword, error, setError, handleLogin } = useAuth();
 
   return (
     <div>

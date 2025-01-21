@@ -1,43 +1,9 @@
-// Register.jsx
 import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
+import useAuth from '../../hooks/useAuth'
 
 const RegisterForm = () => {
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [error, setError] = useState('')
-  const navigate = useNavigate()
-
-  const handleRegister = async (e) => {
-    e.preventDefault()
-    
-    if (password !== confirmPassword) {
-      setError('Les mots de passe ne correspondent pas')
-      return
-    }
-
-    try {
-      const response = await fetch('http://fauques.freeboxos.fr:3000/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
-      })
-
-      if (response.ok) {
-        navigate('/login')
-      } else if (response.status === 409) {
-        setError('Ce nom d\'utilisateur existe déjà')
-      } else {
-        setError('Erreur lors de l\'inscription')
-      }
-    } catch (err) {
-      console.error(err)
-      setError('Erreur de connexion au serveur')
-    }
-  }
+  const { username, setUsername, password, setPassword, confirmPassword, setConfirmPassword, error, setError, handleRegister } = useAuth();
 
   return (
     <div>
