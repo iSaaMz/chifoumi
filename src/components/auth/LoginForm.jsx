@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 
-const Login = () => {
+const LoginForm = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -75,4 +75,4 @@ const Login = () => {
   )
 }
 
-export default Login
+export default LoginForm

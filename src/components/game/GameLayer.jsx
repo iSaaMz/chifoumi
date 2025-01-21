@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-const Game = () => {
+const GameLayer = () => {
   const [match, setMatch] = useState(null)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
@@ -226,4 +226,4 @@ const Game = () => {
   )
 }
 
-export default Game
+export default GameLayer

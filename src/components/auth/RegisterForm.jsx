@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 
-const Register = () => {
+const RegisterForm = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -94,4 +94,4 @@ const Register = () => {
   )
 }
 
-export default Register
+export default RegisterForm
