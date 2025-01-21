@@ -37,71 +37,73 @@ const GameLayer = () => {
   const yourName = username || 'Vous'
 
   return (
-    <div>
-      <div>
-        <h1>Salut {yourName} !</h1>
-        <button onClick={handleLogout}>Se déconnecter</button>
-      </div>
+    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+      <div className="w-full max-w-3xl p-8 space-y-6 bg-white rounded shadow-md">
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-bold">Salut {yourName} !</h1>
+          <button onClick={handleLogout} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">Se déconnecter</button>
+        </div>
 
-      <div>
-        <p>Joueur 1 : {user1?.username || 'En attente...'}</p>
-        <p>Joueur 2 : {user2?.username || 'En attente...'}</p>
-      </div>
+        <div className="space-y-4">
+          <p>Joueur 1 : {user1?.username || 'En attente...'}</p>
+          <p>Joueur 2 : {user2?.username || 'En attente...'}</p>
+        </div>
 
-      {!user2 && (
-        <div>En attente qu&apos;un autre joueur rejoigne la partie...</div>
-      )}
+        {!user2 && (
+          <div className="text-center text-gray-500">En attente qu&apos;un autre joueur rejoigne la partie...</div>
+        )}
 
-      {isMatchOver() && (
+        {isMatchOver() && (
+          <div className="text-center">
+            {winner === null ? (
+              <p className="text-yellow-500">La partie est terminée : Match nul !</p>
+            ) : winner ? (
+              <p className="text-green-500">La partie est terminée, vainqueur : {winner.username}</p>
+            ) : (
+              <p className="text-red-500">3 manches jouées, pas de vainqueur ?</p>
+            )}
+          </div>
+        )}
+
+        {!isMatchOver() && user1 && user2 && (
+          <div className="flex justify-around">
+            <button onClick={() => handleMove('rock')} className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Pierre</button>
+            <button onClick={() => handleMove('paper')} className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Feuille</button>
+            <button onClick={() => handleMove('scissors')} className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Ciseaux</button>
+          </div>
+        )}
+
         <div>
-          {winner === null ? (
-            <p>La partie est terminée : Match nul !</p>
-          ) : winner ? (
-            <p>La partie est terminée, vainqueur : {winner.username}</p>
+          <h2 className="text-xl font-bold">Historique des coups</h2>
+          {turns && turns.length > 0 ? (
+            turns.map((turn, index) => {
+              let turnWinner = ''
+              if (turn.winner === 'user1') turnWinner = user1?.username
+              if (turn.winner === 'user2') turnWinner = user2?.username
+              if (turn.winner === 'draw') turnWinner = 'Égalité'
+
+              return (
+                <div key={index} className="border-t border-gray-200 pt-4">
+                  <p>
+                    <strong>Manche {index + 1} :</strong>
+                    <br />
+                    {user1?.username} a joué : {turn.user1 || '-'}
+                    <br />
+                    {user2?.username} a joué : {turn.user2 || '-'}
+                    {turn.winner && (
+                      <>
+                        <br />
+                        <span>Gagnant de la manche : {turnWinner}</span>
+                      </>
+                    )}
+                  </p>
+                </div>
+              )
+            })
           ) : (
-            <p>3 manches jouées, pas de vainqueur ?</p>
+            <p className="text-gray-500">Aucun coup n&apos;a encore été joué.</p>
           )}
         </div>
-      )}
-
-      {!isMatchOver() && user1 && user2 && (
-        <div>
-          <button onClick={() => handleMove('rock')}>Pierre</button>
-          <button onClick={() => handleMove('paper')}>Feuille</button>
-          <button onClick={() => handleMove('scissors')}>Ciseaux</button>
-        </div>
-      )}
-
-      <div>
-        <h2>Historique des coups</h2>
-        {turns && turns.length > 0 ? (
-          turns.map((turn, index) => {
-            let turnWinner = ''
-            if (turn.winner === 'user1') turnWinner = user1?.username
-            if (turn.winner === 'user2') turnWinner = user2?.username
-            if (turn.winner === 'draw') turnWinner = 'Égalité'
-
-            return (
-              <div key={index}>
-                <p>
-                  <strong>Manche {index + 1} :</strong>
-                  <br />
-                  {user1?.username} a joué : {turn.user1 || '-'}
-                  <br />
-                  {user2?.username} a joué : {turn.user2 || '-'}
-                  {turn.winner && (
-                    <>
-                      <br />
-                      <span>Gagnant de la manche : {turnWinner}</span>
-                    </>
-                  )}
-                </p>
-              </div>
-            )
-          })
-        ) : (
-          <p>Aucun coup n&apos;a encore été joué.</p>
-        )}
       </div>
     </div>
   )
