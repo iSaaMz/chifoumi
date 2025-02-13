@@ -1,9 +1,8 @@
-import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import useAuth from '../../hooks/useAuth'
 
 const RegisterForm = () => {
-  const { username, setUsername, password, setPassword, confirmPassword, setConfirmPassword, error, setError, handleRegister } = useAuth();
+  const { username, setUsername, password, setPassword, confirmPassword, setConfirmPassword, error, handleRegister } = useAuth();
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">

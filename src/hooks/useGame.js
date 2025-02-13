@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 const useGame = () => {
     const [match, setMatch] = useState(null);
@@ -8,9 +7,9 @@ const useGame = () => {
 
     const token = localStorage.getItem('token');
     const username = localStorage.getItem('username');
-    const navigate = useNavigate();
 
-    const API_URL = 'http://fauques.freeboxos.fr:3000';
+    // const API_URL = 'http://fauques.freeboxos.fr:3000';
+    const API_URL = 'http://localhost:3002';
 
     const findOrCreateMatch = async () => {
         try {
