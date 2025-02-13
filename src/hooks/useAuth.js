@@ -9,7 +9,8 @@ const useAuth = () => {
 
     const navigate = useNavigate();
 
-    const API_URL = 'http://fauques.freeboxos.fr:3000';
+    // const API_URL = 'http://fauques.freeboxos.fr:3000';
+    const API_URL = 'http://localhost:3002';
 
     const handleLogin = async (e) => {
         e.preventDefault();
