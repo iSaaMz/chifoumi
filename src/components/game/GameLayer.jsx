@@ -1,30 +1,40 @@
-import { useEffect } from 'react';
-import useAuth from '../../hooks/useAuth';
-import useGame from '../../hooks/useGame';
+import { useEffect, useState } from 'react'
+import useAuth from '../../hooks/useAuth'
+import useGame from '../../hooks/useGame'
 
 const GameLayer = () => {
   const { handleLogout } = useAuth();
   const { match, error, loading, token, username, findOrCreateMatch, refreshMatch, isMatchOver, handleMove } = useGame();
 
+  if(!token || !username) handleLogout();
+  
   useEffect(() => {
-    if (!token || !username) handleLogout();
-    findOrCreateMatch();
-  }, []);
+    findOrCreateMatch()
+  }, [])
 
   useEffect(() => {
-    if (!match) return;
+    if (!match) return
+
     const intervalId = setInterval(() => {
-      refreshMatch();
-    }, 3000);
-    return () => clearInterval(intervalId);
-  }, [match]);
+      refreshMatch()
+    }, 3000)
+    return () => clearInterval(intervalId)
+  }, [match])
 
-  if (loading) return <div className="flex justify-center items-center min-h-screen text-gray-700">Chargement du match...</div>;
-  if (error) return <div className="flex justify-center items-center min-h-screen text-red-500">Erreur : {error}</div>;
-  if (!match) return <div className="flex justify-center items-center min-h-screen text-gray-500">Aucun match en cours.</div>;
+  if (loading) {
+    return <div>Chargement du match...</div>
+  }
 
-  const { user1, user2, turns, winner } = match;
-  const yourName = username || 'Vous';
+  if (error) {
+    return <div>Erreur : {error}</div>
+  }
+
+  if (!match) {
+    return <div>Aucun match en cours.</div>
+  }
+
+  const { user1, user2, turns, winner } = match
+  const yourName = username || 'Vous'
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
@@ -34,7 +44,7 @@ const GameLayer = () => {
           <button onClick={handleLogout} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">Se déconnecter</button>
         </div>
 
-        <div className="space-y-4 text-gray-700">
+        <div className="space-y-4">
           <p>Joueur 1 : {user1?.username || 'En attente...'}</p>
           <p>Joueur 2 : {user2?.username || 'En attente...'}</p>
         </div>
@@ -44,7 +54,7 @@ const GameLayer = () => {
         )}
 
         {isMatchOver() && (
-          <div className="text-center font-semibold">
+          <div className="text-center">
             {winner === null ? (
               <p className="text-yellow-500">La partie est terminée : Match nul !</p>
             ) : winner ? (
@@ -67,10 +77,10 @@ const GameLayer = () => {
           <h2 className="text-xl font-bold">Historique des coups</h2>
           {turns && turns.length > 0 ? (
             turns.map((turn, index) => {
-              let turnWinner = '';
-              if (turn.winner === 'user1') turnWinner = user1?.username;
-              if (turn.winner === 'user2') turnWinner = user2?.username;
-              if (turn.winner === 'draw') turnWinner = 'Égalité';
+              let turnWinner = ''
+              if (turn.winner === 'user1') turnWinner = user1?.username
+              if (turn.winner === 'user2') turnWinner = user2?.username
+              if (turn.winner === 'draw') turnWinner = 'Égalité'
 
               return (
                 <div key={index} className="border-t border-gray-200 pt-4">
@@ -83,12 +93,12 @@ const GameLayer = () => {
                     {turn.winner && (
                       <>
                         <br />
-                        <span className="text-blue-600">Gagnant de la manche : {turnWinner}</span>
+                        <span>Gagnant de la manche : {turnWinner}</span>
                       </>
                     )}
                   </p>
                 </div>
-              );
+              )
             })
           ) : (
             <p className="text-gray-500">Aucun coup n&apos;a encore été joué.</p>
@@ -96,7 +106,7 @@ const GameLayer = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default GameLayer;
+export default GameLayer
