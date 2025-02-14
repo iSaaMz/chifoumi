@@ -60,21 +60,10 @@ const GameLayer = () => {
     }
 
     const { user1, user2, turns, winner } = match;
-    const yourName = username || 'Vous';
 
     return (
         <div className="flex justify-center items-center min-h-screen bg-gray-100">
             <div className="w-full max-w-3xl p-8 space-y-6 bg-white rounded shadow-md">
-
-                <div className="flex justify-between items-center">
-                    <h1 className="text-2xl font-bold">Salut {yourName} !</h1>
-                    <button
-                        onClick={handleLogout}
-                        className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
-                    >
-                        Se déconnecter
-                    </button>
-                </div>
 
                 <div className="grid grid-cols-4 gap-4 p-4 bg-gray-50 rounded">
                     <div className="text-center">
@@ -158,8 +147,8 @@ const GameLayer = () => {
                         <div className="space-y-4">
                             {turns.map((turn, index) => {
                                 let turnWinner = '';
-                                if (turn.winner === 'user1') turnWinner = user1?.username;
-                                if (turn.winner === 'user2') turnWinner = user2?.username;
+                                if (turn.winner === 'user1') turnWinner = `Victoire de ${user1?.username}`;
+                                if (turn.winner === 'user2') turnWinner = `Victoire de ${user2?.username}`;
                                 if (turn.winner === 'draw') turnWinner = 'Égalité';
 
                                 return (

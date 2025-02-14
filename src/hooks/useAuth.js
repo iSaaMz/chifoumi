@@ -8,8 +8,7 @@ const useAuth = () => {
     const [error, setError] = useState(null);
 
     const navigate = useNavigate();
-
-    // const API_URL = 'http://fauques.freeboxos.fr:3000';
+    
     const API_URL = import.meta.env.VITE_API_URL;
 
     const handleLogin = async (e) => {
@@ -32,7 +31,7 @@ const useAuth = () => {
                 const data = await response.json();
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('username', username);
-                navigate('/game');
+                navigate('/home');
             } else {
                 setError('Identifiants incorrects');
             }
