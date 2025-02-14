@@ -10,7 +10,7 @@ const useAuth = () => {
     const navigate = useNavigate();
 
     // const API_URL = 'http://fauques.freeboxos.fr:3000';
-    const API_URL = 'http://localhost:3002';
+    const API_URL = import.meta.env.VITE_API_URL;
 
     const handleLogin = async (e) => {
         e.preventDefault();
