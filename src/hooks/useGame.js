@@ -1,4 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { EventSourcePolyfill } from 'event-source-polyfill';
+import _ from 'lodash';
 
 const useGame = () => {
     const [match, setMatch] = useState(null);
@@ -17,10 +19,19 @@ const useGame = () => {
     const token = localStorage.getItem('token');
     const username = localStorage.getItem('username');
     const API_URL = 'http://localhost:3002';
+    const eventSourceRef = useRef(null);
 
     useEffect(() => {
         localStorage.setItem('gameStats', JSON.stringify(stats));
     }, [stats]);
+
+    useEffect(() => {
+        return () => {
+            if (eventSourceRef.current) {
+                eventSourceRef.current.close();
+            }
+        };
+    }, []);
 
     const updateStats = (matchResult) => {
         if (!matchResult?.winner && matchResult?.winner !== null) return;
@@ -42,42 +53,81 @@ const useGame = () => {
     };
 
     const setupEventSource = (matchId) => {
-        // Utilisation de l'EventSource natif
-        const eventSource = new EventSource(
+        if (eventSourceRef.current) {
+            eventSourceRef.current.close();
+        }
+
+        eventSourceRef.current = new EventSourcePolyfill(
             `${API_URL}/matches/${matchId}/subscribe`,
-            // Les headers sont passés via les options de fetch quand nécessaire
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                heartbeatTimeout: 60000,
+                reconnectInterval: 5000
+            }
         );
 
-        eventSource.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            handleGameEvent(data);
+        eventSourceRef.current.onmessage = (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                handleGameEvent(data);
+            } catch (error) {
+                console.error('Erreur lors du parsing des données:', error);
+            }
         };
 
-        eventSource.onerror = (error) => {
-            console.error('SSE Error:', error);
-            eventSource.close();
+        eventSourceRef.current.onerror = (error) => {
+            console.error('Erreur SSE:', error);
+
+            if (eventSourceRef.current) {
+                eventSourceRef.current.close();
+            }
+            setTimeout(() => setupEventSource(matchId), 5000);
         };
 
-        return () => {
-            eventSource.close();
+        eventSourceRef.current.onopen = () => {
+            console.log('Connexion SSE établie avec succès');
         };
     };
 
-    const handleGameEvent = (event) => {
+    const handleGameEvent = _.debounce((event) => {
         switch(event.type) {
-            case 'PLAYER1_JOIN':
-            case 'PLAYER2_JOIN':
             case 'PLAYER1_MOVED':
             case 'PLAYER2_MOVED':
             case 'TURN_ENDED':
             case 'MATCH_ENDED':
+            case 'PLAYER1_JOIN':
+            case 'PLAYER2_JOIN':
             case 'NEW_TURN':
                 refreshMatch();
                 break;
             default:
-                console.log('Unknown event type:', event.type);
+                console.log('Type d\'événement inconnu:', event.type);
         }
-    };
+    }, 1000);
+
+    const refreshMatch = _.debounce(async () => {
+        if (!match?._id) return;
+        
+        try {
+            const res = await fetch(`${API_URL}/matches/${match._id}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            
+            if (res.ok) {
+                const updatedMatch = await res.json();
+                setMatch(updatedMatch);
+                
+                if (updatedMatch.turns.length === 3 && 
+                    updatedMatch.turns.every(turn => turn.user1 && turn.user2)) {
+                    updateStats(updatedMatch);
+                }
+            }
+        } catch (err) {
+            console.error('Erreur lors du refresh du match : ', err);
+        }
+    }, 1000);
 
     const findOrCreateMatch = async () => {
         try {
@@ -126,27 +176,6 @@ const useGame = () => {
         }
     };
 
-    const refreshMatch = async () => {
-        if (!match?._id) return;
-        
-        try {
-            const res = await fetch(`${API_URL}/matches/${match._id}`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            
-            if (res.ok) {
-                const updatedMatch = await res.json();
-                setMatch(updatedMatch);
-                
-                if (updatedMatch.winner !== undefined || updatedMatch.turns.length === 3) {
-                    updateStats(updatedMatch);
-                }
-            }
-        } catch (err) {
-            console.error('Erreur lors du refresh du match : ', err);
-        }
-    };
-
     const getCurrentTurnId = () => {
         if (!match?.turns || match.turns.length === 0) {
             return 1;
@@ -162,7 +191,9 @@ const useGame = () => {
     };
 
     const isMatchOver = () => {
-        return match?.winner !== undefined || match?.turns?.length === 3;
+        const allTurnsPlayed = match?.turns?.every(turn => turn.user1 && turn.user2);
+        const hasThreeTurns = match?.turns?.length === 3;
+        return (hasThreeTurns && allTurnsPlayed) || match?.winner !== undefined;
     };
 
     const handleMove = async (move) => {
@@ -186,7 +217,9 @@ const useGame = () => {
                 const errBody = await res.json();
                 setError(errBody.turn || errBody.user || 'Erreur lors de la soumission du coup.');
             } else {
-                await refreshMatch();
+                    setTimeout(async () => {
+                        refreshMatch();
+                    }, 200);
             }
         } catch (err) {
             console.error(err);

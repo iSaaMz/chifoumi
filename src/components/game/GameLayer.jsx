@@ -13,7 +13,8 @@ const GameLayer = () => {
         stats,
         findOrCreateMatch,
         isMatchOver,
-        handleMove
+        handleMove,
+        refreshMatch
     } = useGame();
 
     if (!token || !username) handleLogout();
@@ -21,6 +22,16 @@ const GameLayer = () => {
     useEffect(() => {
         findOrCreateMatch();
     }, []);
+
+    useEffect(() => {
+        if (!match?._id) return;
+
+        const refreshInterval = setInterval(() => {
+            refreshMatch();
+        }, 2000);
+
+        return () => clearInterval(refreshInterval);
+    }, [match?._id]);
 
     if (loading) {
         return (
