@@ -12,7 +12,6 @@ const GameLayer = () => {
         username,
         stats,
         findOrCreateMatch,
-        refreshMatch,
         isMatchOver,
         handleMove
     } = useGame();
