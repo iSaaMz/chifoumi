@@ -14,7 +14,7 @@ const HomePage = () => {
         </p>
         <div className="flex justify-center mb-8">
           <img
-            src="https://via.placeholder.com/400x200"
+            src="/chifoumi.png"
             alt="Illustration Chi Fou Mi"
             className="rounded-md shadow-md"
           />
