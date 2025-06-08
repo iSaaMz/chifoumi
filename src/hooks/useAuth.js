@@ -2,9 +2,12 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const useAuth = () => {
-    const [username, setUsername] = useState(null);
-    const [password, setPassword] = useState(null);
-    const [confirmPassword, setConfirmPassword] = useState(null);
+    // Initialize form fields with empty strings to keep inputs controlled
+    // from the first render. Using `null` here would make the inputs switch
+    // from uncontrolled to controlled, which triggers React warnings.
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState(null);
 
     const navigate = useNavigate();
